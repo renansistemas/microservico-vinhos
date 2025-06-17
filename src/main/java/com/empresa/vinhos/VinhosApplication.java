@@ -6,14 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 import java.util.logging.Logger;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class VinhosApplication implements CommandLineRunner {
 
     @Autowired
     private MockDataConsumer mockDataConsumer;
+
 
     public static void main(String[] args) {
         SpringApplication.run(VinhosApplication.class, args);

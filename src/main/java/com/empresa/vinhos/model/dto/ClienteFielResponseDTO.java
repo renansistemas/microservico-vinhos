@@ -17,7 +17,5 @@ public record ClienteFielResponseDTO(
         @JsonProperty("valor_total_gasto")
         BigDecimal valorTotalGasto
 
-//        @JsonProperty("produtos_diferentes")
-//        Integer produtosDiferentes
 ) {
 }
