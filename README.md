@@ -4,47 +4,28 @@
 Microserviço desenvolvido em Spring Boot para gerenciamento de compras de vinhos, fornecendo endpoints para consulta de compras, análise de clientes fiéis e sistema de recomendações.
 
 ## Tecnologias Utilizadas
-- Java 11+
-- Spring Boot 2.x
-- Jackson (para JSON)
-- Maven
+- Java 8: Stream API, Lambda Expressions, Optional, Method References e Functional Interfaces
+- Java 10: Local Variable Type Inference (var)
+- Java 14: Records
+- Java 16: Stream.toList()
+- Maven para gerenciamento de dependências
+- Spring Boot 3.2.5 com as seguintes dependências:
+1. Spring Boot Starter Web para criar uma API RESTful
+2. Spring Boot Starter Validation para validação de dados
+3. Sping Data para paginação e ordenação de resultados
+4. Jackson (para serialização e desserialização de JSON)
 
-## Endpoints Disponíveis
+## Padrões de Arquitetura  
+**Layered Architecture:** sistema dividido em camadas
+- **Controller:** responsável por receber e processar solicitações HTTP
+- **Model:** entidades de domínio e DTOs
+- **Service:** contém a lógica de negócio 
+- (para este cenário não tem a camada de REPOSITORY)
 
-### 4. Recomendação de Vinho
-```
-GET /recomendacao/{cpf}/tipo
-```
-Retorna recomendações de vinho baseadas no histórico do cliente.
-
-**Exemplo:**
-```
-GET /recomendacao/05870189179/tipo
-```
-
-**Resposta:**
-```json
-{
-  "cpfCliente": "05870189179",
-  "tipoVinhoPreferido": "Tinto",
-  "produtosRecomendados": [
-    {
-      "codigo": 6,
-      "tipo_vinho": "Tinto",
-      "preco": 327.50,
-      "safra": "2016",
-      "ano_compra": 2017
-    },
-    {
-      "codigo": 11,
-      "tipo_vinho": "Tinto",
-      "preco": 128.99,
-      "safra": "2017",
-      "ano_compra": 2018
-    }
-  ]
-}
-```
+**Objetivos principais ao utilizar essa arquitetura**
+- Implementar a separação de responsabilidades (SRP - Single Responsibility Principle)
+- Reduzir acoplamento
+- Facilitar manutenção, testes e evolução do sistema
 
 ## Como Executar
 
@@ -107,6 +88,9 @@ src/
 │   │           └── RecomendacaoService.java
 │   └── resources/
 │       └── application.properties
+docs/
+└── swagger.yaml
+
 ```
 
 ## Lógica de Negócio
@@ -137,14 +121,6 @@ src/
 ✅ Logs de inicialização e operações  
 ✅ Validação de carregamento de dados
 
-## Observações Técnicas
-
-- Os dados são carregados uma única vez no startup da aplicação e mantidos em memória
-- A paginação é implementada manualmente devido à natureza dos dados em memória
-- O sistema de recomendação considera o tipo de vinho mais comprado pelo cliente
-- Tratamento de CPFs com diferentes formatos nos dados de origem
-- Cálculos de valores utilizando BigDecimal para precisão monetária
-
 ## Testes
 
 Para testar os endpoints, você pode usar curl, Postman ou qualquer cliente HTTP:
@@ -170,111 +146,40 @@ Certifique-se de que seu `pom.xml` inclui as seguintes dependências:
 
 ```xml
 <dependencies>
+
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-web</artifactId>
+        <version>3.2.5</version>
     </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
+
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
     </dependency>
+
+    <dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator</artifactId>
+    </dependency>
+
     <dependency>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
+
+    <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        <version>2.5.0</version>
+    </dependency>
+
 </dependencies>
-```1. Listar Compras
-```
-GET /compras?page=0&size=10&sort=valorTotal&direction=asc
-```
-Retorna lista paginada de compras ordenadas por valor total crescente.
-
-**Parâmetros de Query:**
-- `page`: Número da página (padrão: 0)
-- `size`: Tamanho da página (padrão: 10)
-- `sort`: Campo para ordenação (padrão: valorTotal)
-- `direction`: Direção da ordenação - asc/desc (padrão: asc)
-
-**Resposta:**
-```json
-{
-  "content": [
-    {
-      "nomeCliente": "Nome do Cliente",
-      "cpfCliente": "12345678901",
-      "produto": {
-        "codigo": 1,
-        "tipo_vinho": "Tinto",
-        "preco": 229.99,
-        "safra": "2017",
-        "ano_compra": 2018
-      },
-      "quantidade": 5,
-      "valorTotal": 1149.95
-    }
-  ],
-  "pageable": {...},
-  "totalElements": 50,
-  "totalPages": 5
-}
 ```
 
-### 2. Maior Compra por Ano
-```
-GET /maior-compra/{ano}
-```
-Retorna a maior compra do ano especificado.
+## Pontos de melhoria para o projeto
 
-**Exemplo:**
-```
-GET /maior-compra/2018
-```
-
-**Resposta:**
-```json
-{
-  "nomeCliente": "Nome do Cliente",
-  "cpfCliente": "12345678901",
-  "produto": {
-    "codigo": 1,
-    "tipo_vinho": "Tinto",
-    "preco": 229.99,
-    "safra": "2017",
-    "ano_compra": 2018
-  },
-  "quantidade": 10,
-  "valorTotal": 2299.90
-}
-```
-
-### 3. Top 3 Clientes Fiéis
-```
-GET /clientes-fieis?limit=3&page=0
-```
-Retorna os clientes com maiores gastos e mais compras recorrentes.
-
-**Parâmetros de Query:**
-- `limit`: Número de clientes no ranking (padrão: 3)
-- `page`: Número da página (padrão: 0)
-
-**Resposta:**
-```json
-{
-  "content": [
-    {
-      "nome": "Nome do Cliente",
-      "cpf": "12345678901",
-      "totalCompras": 25,
-      "valorTotalGasto": 5000.00
-    }
-  ],
-  "totalElements": 3
-}
-```
-
-###
+1. Adicionar camada de persistencia
+2. Rate limiting para APIs
+3. Testes unitário com JUnit e Mockito
+4. Utilização de containers Docker e Docker Compose

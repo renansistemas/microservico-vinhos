@@ -1,0 +1,274 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /recomendacao/{cpf}/tipo:
+    get:
+      tags:
+      - produto-controller
+      operationId: getRecomendacaoDeVinho
+      parameters:
+      - name: cpf
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/RecomendacaoResponseDTO'
+  /maior-compra/{ano}:
+    get:
+      tags:
+      - compra-controller
+      operationId: getMaiorCompraPorAno
+      parameters:
+      - name: ano
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CompraResponseDTO'
+  /compras:
+    get:
+      tags:
+      - compra-controller
+      operationId: listarCompras
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+          default: valorTotal
+      - name: direction
+        in: query
+        required: false
+        schema:
+          type: string
+          default: asc
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageCompraResponseDTO'
+  /clientes-fieis:
+    get:
+      tags:
+      - cliente-controller
+      operationId: getClientesFieis
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 3
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageClienteFielResponseDTO'
+components:
+  schemas:
+    ProdutoRecomendadoDTO:
+      type: object
+      properties:
+        codigo:
+          type: integer
+          format: int32
+        tipo_vinho:
+          type: string
+        preco:
+          type: number
+        safra:
+          type: string
+        ano_compra:
+          type: integer
+          format: int32
+    RecomendacaoResponseDTO:
+      type: object
+      properties:
+        cpf_cliente:
+          type: string
+        tipo_vinho_preferido:
+          type: string
+        produto_recomendado:
+          $ref: '#/components/schemas/ProdutoRecomendadoDTO'
+    CompraResponseDTO:
+      type: object
+      properties:
+        nome_cliente:
+          type: string
+        cpf_cliente:
+          type: string
+        codigo_produto:
+          type: integer
+          format: int32
+        tipo_vinho:
+          type: string
+        preco_unitario:
+          type: number
+        safra:
+          type: string
+        ano_compra:
+          type: integer
+          format: int32
+        quantidade:
+          type: integer
+          format: int32
+        valor_total:
+          type: number
+    PageCompraResponseDTO:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompraResponseDTO'
+        number:
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        offset:
+          type: integer
+          format: int64
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        direction:
+          type: string
+        nullHandling:
+          type: string
+        ascending:
+          type: boolean
+        property:
+          type: string
+        ignoreCase:
+          type: boolean
+    ClienteFielResponseDTO:
+      type: object
+      properties:
+        nome_cliente:
+          type: string
+        cpf_cliente:
+          type: string
+        total_compras:
+          type: integer
+          format: int32
+        valor_total_gasto:
+          type: number
+    PageClienteFielResponseDTO:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClienteFielResponseDTO'
+        number:
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean

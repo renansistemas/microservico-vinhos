@@ -1,8 +1,6 @@
 package com.empresa.vinhos.service;
 
 import com.empresa.vinhos.model.dto.CompraResponseDTO;
-import com.empresa.vinhos.model.entity.Cliente;
-import com.empresa.vinhos.model.entity.Produto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,16 +19,16 @@ public class CompraService {
     private MockDataConsumer mockDataConsumer;
 
     public Page<CompraResponseDTO> listarCompras(Pageable pageable) {
-        List<CompraResponseDTO> todasCompras = construirListaCompras();
+        var todasCompras = construirListaCompras();
 
         // Ordenar por valor total crescente
-        List<CompraResponseDTO> comprasOrdenadas = todasCompras
+        var comprasOrdenadas = todasCompras
                 .stream()
                 .sorted(Comparator.comparing(CompraResponseDTO::valorTotal))
                 .toList();
 
         // Paginar com skip e limit
-        List<CompraResponseDTO> comprasPaginadas = comprasOrdenadas.stream()
+        var comprasPaginadas = comprasOrdenadas.stream()
                 .skip(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .toList();
@@ -45,8 +43,8 @@ public class CompraService {
     }
 
     private List<CompraResponseDTO> construirListaCompras() {
-        List<Produto> produtos = mockDataConsumer.getProdutos();
-        List<Cliente> clientes = mockDataConsumer.getClientes();
+        var produtos = mockDataConsumer.getProdutos();
+        var clientes = mockDataConsumer.getClientes();
 
         return clientes.stream()
                 .flatMap(cliente -> cliente.compras().stream()

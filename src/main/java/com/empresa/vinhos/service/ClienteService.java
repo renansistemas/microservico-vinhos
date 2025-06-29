@@ -1,9 +1,7 @@
 package com.empresa.vinhos.service;
 
 import com.empresa.vinhos.model.dto.ClienteFielResponseDTO;
-import com.empresa.vinhos.model.entity.Cliente;
 import com.empresa.vinhos.model.entity.CompraItem;
-import com.empresa.vinhos.model.entity.Produto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,9 +20,9 @@ public class ClienteService {
     private MockDataConsumer mockDataConsumer;
 
     public Page<ClienteFielResponseDTO> getClientesFieis(Pageable pageable, int limit) {
-        List<ClienteFielResponseDTO> clientesFieis = construirListaClientesFieis();
+        var clientesFieis = construirListaClientesFieis();
 
-        List<ClienteFielResponseDTO> topClientes = clientesFieis.stream()
+        var topClientes = clientesFieis.stream()
                 .sorted(Comparator
                         .comparing(ClienteFielResponseDTO::valorTotalGasto, Comparator.reverseOrder())
                         .thenComparing(ClienteFielResponseDTO::totalCompras, Comparator.reverseOrder()))
@@ -37,8 +35,8 @@ public class ClienteService {
     }
 
     private List<ClienteFielResponseDTO> construirListaClientesFieis() {
-        List<Cliente> clientes = mockDataConsumer.getClientes();
-        List<Produto> produtos = mockDataConsumer.getProdutos();
+        var clientes = mockDataConsumer.getClientes();
+        var produtos = mockDataConsumer.getProdutos();
 
         return clientes.stream()
                 .map(cliente -> {

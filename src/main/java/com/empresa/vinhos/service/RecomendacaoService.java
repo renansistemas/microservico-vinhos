@@ -2,12 +2,10 @@ package com.empresa.vinhos.service;
 
 import com.empresa.vinhos.model.dto.ProdutoRecomendadoDTO;
 import com.empresa.vinhos.model.dto.RecomendacaoResponseDTO;
-import com.empresa.vinhos.model.entity.Cliente;
 import com.empresa.vinhos.model.entity.Produto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -19,8 +17,8 @@ public class RecomendacaoService {
     private MockDataConsumer mockDataConsumer;
 
     public RecomendacaoResponseDTO getRecomendacaoDeVinho(String cpf) {
-        List<Cliente> clientes = mockDataConsumer.getClientes();
-        List<Produto> produtos = mockDataConsumer.getProdutos();
+        var clientes = mockDataConsumer.getClientes();
+        var produtos = mockDataConsumer.getProdutos();
 
         return clientes.stream()
                 .filter(c -> c.cpf().equals(cpf))
